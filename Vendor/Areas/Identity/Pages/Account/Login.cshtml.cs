@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Vendor.Constants;
 
 namespace Vendor.Areas.Identity.Pages.Account
 {
@@ -84,7 +85,13 @@ namespace Vendor.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
+                   //if(Input.Email == "adeshiname@gmail.com")
+                   // {
+                   //     var user = await _userManager.FindByEmailAsync(Input.Email);
+                   //     await _userManager.AddToRoleAsync(user, "UncleShenor");
+                   // }
                     _logger.LogInformation("User logged in.");
+                    TempData[SD.Success] = "Login Successfull";
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -99,6 +106,7 @@ namespace Vendor.Areas.Identity.Pages.Account
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    TempData[SD.Error] = "Invalid login attempt.";
                     return Page();
                 }
             }

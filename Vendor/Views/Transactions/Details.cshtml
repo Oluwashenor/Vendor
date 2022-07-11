@@ -1,0 +1,99 @@
+﻿@model Vendor.Models.ViewModels.TransactionDetailViewModel
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@Model.Store.Name</h1>
+
+<div>
+    <h4>Sale</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Transaction.Outlet)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Transaction.Outlet.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Transaction.Customer)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Transaction.Customer.UserName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Transaction.Cashier)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Transaction.Cashier.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Transaction.TransactionTime)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Transaction.TransactionTime)
+        </dd>
+    </dl>
+</div>
+
+<div class="container">
+    <div class="col-md-6" style="max-height:250px;overflow-x:auto; margin-top:25px;">
+
+        <table id="Table" class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Menu
+                    </th>
+                    <th>
+                        Costs
+                    </th>
+                    <th>
+                        Quantity
+                    </th>
+                    <th>
+                        Amount
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Sales)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Menu.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Menu.Amount)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Quantity)
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    
+                    <td>
+                        <span style="">Total</span>
+                        
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.Transaction.Amount)
+                    </td>
+                </tr>
+
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Transaction.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Vendor.Constants;
 using Vendor.Models;
 
 namespace Vendor.Areas.Identity.Pages.Account
@@ -22,12 +23,14 @@ namespace Vendor.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
+            RoleManager<IdentityRole> roleManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
@@ -35,6 +38,7 @@ namespace Vendor.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         [BindProperty]
@@ -69,6 +73,14 @@ namespace Vendor.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
+            if (!await _roleManager.RoleExistsAsync("StoreOwner"))
+            {
+                await _roleManager.CreateAsync(new IdentityRole("Cashier"));
+                await _roleManager.CreateAsync(new IdentityRole("StoreOwner"));
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                await _roleManager.CreateAsync(new IdentityRole("UncleShenor"));
+              
+            }
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
@@ -83,7 +95,13 @@ namespace Vendor.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
+                    if(Input.Email == "adeshiname@gmail.com")
+                    {
+                        await _userManager.AddToRoleAsync(user, "UncleShenor");
+                    }
+                   
                     _logger.LogInformation("User created a new account with password.");
+                    TempData[SD.Success] = "Account Creation Successful";
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -109,6 +127,7 @@ namespace Vendor.Areas.Identity.Pages.Account
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
+                    TempData[SD.Error] = error.Description;
                 }
             }
 

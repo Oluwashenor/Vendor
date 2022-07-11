@@ -1,0 +1,55 @@
+﻿@model Vendor.Models.ViewModels.TransactionIndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    @*<a asp-action="Create">Create New</a>*@
+    <a asp-route-outletId="@Model.OutletId" asp-controller="Sales" asp-action="Create">Create New Sale</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+               Outlet
+            </th>
+            <th>
+                Customer
+            </th>
+            <th>
+               Cashier
+            </th>
+            <th>
+             TransactionTime
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Transactions) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Outlet.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Customer.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cashier.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TransactionTime)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

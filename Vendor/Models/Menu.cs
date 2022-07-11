@@ -10,7 +10,7 @@ namespace Vendor.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public double Amount { get; set; }
-        public Location Location { get; set; }
-        public int LocationId { get; set; }
+        public Outlet Outlet { get; set; }
+        public int OutletId { get; set; }
     }
 }

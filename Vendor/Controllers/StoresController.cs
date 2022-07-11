@@ -2,29 +2,68 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Vendor.Constants;
 using Vendor.Data;
 using Vendor.Models;
+using Vendor.Models.ViewModels;
 
 namespace Vendor.Controllers
 {
     public class StoresController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
-        public StoresController(ApplicationDbContext context)
+        public StoresController(ApplicationDbContext context, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _context = context;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         // GET: Stores
         public async Task<IActionResult> Index()
         {
-            var stores = _context.Stores.Include(s => s.User);
-            var data = await stores.ToListAsync();
-            return View(data);
+            if (User.IsInRole("Cashier"))
+            {
+                return BadRequest();
+            }
+            if (User.IsInRole("StoreOwner"))
+            {
+                var loggedInUser = _userManager.GetUserId(User);
+                var user = _context.ApplicationUsers.Where(u => u.Id == loggedInUser).FirstOrDefault();
+                var stores = _context.Stores.Include(s => s.User).Where(s => s.UserId == loggedInUser);
+                var data = await stores.ToListAsync();
+                if(data.Count() < 1){
+                    TempData[SD.Success] = "Welcome, Please Click on \'Create New\' to Begin";
+                }
+               
+                var viewModel = new StoreIndexViewModel()
+                {
+                    Store = data,
+                    User = user
+                };
+                return View(viewModel);
+            }
+            if (User.IsInRole("UncleShenor"))
+            {
+                var stores =await _context.Stores.Include(s=>s.User).ToListAsync();
+                var viewModel = new StoreIndexViewModel()
+                {
+                    Store = stores
+                };
+                return View("IndexSuperAdmin", viewModel);
+            }
+            else
+            {
+                return BadRequest();
+            }
+           
         }
 
         // GET: Stores/Details/5
@@ -49,7 +88,7 @@ namespace Vendor.Controllers
         // GET: Stores/Create
         public IActionResult Create()
         {
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
+            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Name");
             return View();
         }
 
@@ -58,15 +97,22 @@ namespace Vendor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,UserId,IsActive,IsLocked,IsDeleted")] Store store)
+        public async Task<IActionResult> Create([Bind("Name,Description,UserId,IsActive,IsLocked,IsDeleted")] Store store)
         {
+            if(store.UserId == null)
+            {
+                var loggedInUser = _userManager.GetUserId(User);
+                store.UserId = loggedInUser;
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(store);
                 await _context.SaveChangesAsync();
+                TempData[SD.Success] = "Store Created Successfully, Please proceed to creating Outlets for this store";
                 return RedirectToAction(nameof(Index));
             }
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", store.UserId);
+            TempData[SD.Error] = "Unable to Create store, Please Try Again";
             return View(store);
         }
 

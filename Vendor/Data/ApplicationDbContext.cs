@@ -14,10 +14,15 @@ namespace Vendor.Data
         {
         }
 
-        public DbSet<Sale> Sales { get; set; }
-        public DbSet<Menu> Menus { get; set; }
+
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
-        public DbSet<Location> Locations { get; set; }
         public DbSet<Store> Stores { get; set; }
+        public DbSet<Outlet> Outlets { get; set; }
+        public DbSet<Menu> Menus { get; set; }  
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Sale> Sales { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        
     }
 }

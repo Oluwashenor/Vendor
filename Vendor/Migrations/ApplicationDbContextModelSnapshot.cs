@@ -3,22 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vendor.Data;
 
-namespace Vendor.Data.Migrations
+namespace Vendor.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220414185417_InitialModels")]
-    partial class InitialModels
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.15")
+                .HasAnnotation("ProductVersion", "5.0.16")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -227,6 +225,29 @@ namespace Vendor.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("Vendor.Models.Customer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("OutletId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OutletId");
+
+                    b.ToTable("Customers");
+                });
+
             modelBuilder.Entity("Vendor.Models.Location", b =>
                 {
                     b.Property<int>("Id")
@@ -257,17 +278,40 @@ namespace Vendor.Data.Migrations
                     b.Property<double>("Amount")
                         .HasColumnType("float");
 
-                    b.Property<int>("LocationId")
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OutletId")
                         .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OutletId");
+
+                    b.ToTable("Menus");
+                });
+
+            modelBuilder.Entity("Vendor.Models.Outlet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("PointOfSales")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StoreId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("LocationId");
+                    b.HasIndex("StoreId");
 
-                    b.ToTable("Menus");
+                    b.ToTable("Outlets");
                 });
 
             modelBuilder.Entity("Vendor.Models.Sale", b =>
@@ -277,17 +321,23 @@ namespace Vendor.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CashierId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
 
-                    b.Property<string>("CustomerId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("MenuId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransactionId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CashierId");
+                    b.HasIndex("MenuId");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("TransactionId");
 
                     b.ToTable("Sales");
                 });
@@ -314,6 +364,9 @@ namespace Vendor.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Outlets")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
@@ -324,9 +377,45 @@ namespace Vendor.Data.Migrations
                     b.ToTable("Stores");
                 });
 
+            modelBuilder.Entity("Vendor.Models.Transaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<string>("CashierId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OutletId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransactionTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CashierId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("OutletId");
+
+                    b.ToTable("Transactions");
+                });
+
             modelBuilder.Entity("Vendor.Models.ApplicationUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<int>("MaxStores")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -385,6 +474,17 @@ namespace Vendor.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Vendor.Models.Customer", b =>
+                {
+                    b.HasOne("Vendor.Models.Outlet", "Outlet")
+                        .WithMany()
+                        .HasForeignKey("OutletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Outlet");
+                });
+
             modelBuilder.Entity("Vendor.Models.Location", b =>
                 {
                     b.HasOne("Vendor.Models.Store", "Store")
@@ -398,28 +498,43 @@ namespace Vendor.Data.Migrations
 
             modelBuilder.Entity("Vendor.Models.Menu", b =>
                 {
-                    b.HasOne("Vendor.Models.Location", "Location")
+                    b.HasOne("Vendor.Models.Outlet", "Outlet")
                         .WithMany()
-                        .HasForeignKey("LocationId")
+                        .HasForeignKey("OutletId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Location");
+                    b.Navigation("Outlet");
+                });
+
+            modelBuilder.Entity("Vendor.Models.Outlet", b =>
+                {
+                    b.HasOne("Vendor.Models.Store", "Store")
+                        .WithMany()
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("Vendor.Models.Sale", b =>
                 {
-                    b.HasOne("Vendor.Models.ApplicationUser", "Cashier")
+                    b.HasOne("Vendor.Models.Menu", "Menu")
                         .WithMany()
-                        .HasForeignKey("CashierId");
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Vendor.Models.ApplicationUser", "Customer")
+                    b.HasOne("Vendor.Models.Transaction", "Transaction")
                         .WithMany()
-                        .HasForeignKey("CustomerId");
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Cashier");
+                    b.Navigation("Menu");
 
-                    b.Navigation("Customer");
+                    b.Navigation("Transaction");
                 });
 
             modelBuilder.Entity("Vendor.Models.Store", b =>
@@ -429,6 +544,31 @@ namespace Vendor.Data.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Vendor.Models.Transaction", b =>
+                {
+                    b.HasOne("Vendor.Models.ApplicationUser", "Cashier")
+                        .WithMany()
+                        .HasForeignKey("CashierId");
+
+                    b.HasOne("Vendor.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vendor.Models.Outlet", "Outlet")
+                        .WithMany()
+                        .HasForeignKey("OutletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cashier");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Outlet");
                 });
 #pragma warning restore 612, 618
         }

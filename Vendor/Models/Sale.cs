@@ -8,9 +8,12 @@ namespace Vendor.Models
     public class Sale
     {
         public int Id { get; set; }
-        public ApplicationUser Customer { get; set; }
-        public string CustomerId { get; set; }
-        public ApplicationUser Cashier { get; set; }
-        public string CashierId { get; set; }
+        public int TransactionId { get; set; }
+        public Transaction Transaction { get; set; }
+        public int MenuId { get; set; }
+        public Menu Menu { get; set; }
+        public int IsDeleted { get; set; }
+        public int Quantity { get; set; }
+
     }
 }

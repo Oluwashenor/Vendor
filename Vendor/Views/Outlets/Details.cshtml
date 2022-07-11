@@ -1,0 +1,37 @@
+﻿@model Vendor.Models.Outlet
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Location</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Store)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Store.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    @*<a asp-action="Create" asp-controller="Menus" asp-route-storeId="@Model.StoreId">Create Menu</a> |*@
+    <a asp-action="Index" asp-controller="Menus" asp-route-outletId="@Model.Id">Menu</a> |
+    <a asp-action="Create" asp-controller="Cashiers" asp-route-id="@Model.Id">Create Cashiers</a> |
+    <a asp-action="Create" asp-controller="Customers" asp-route-id="@Model.Id">Create Customers</a> |
+    <a asp-action="Index" asp-controller="Transactions" asp-route-outletId="@Model.Id">Transactions</a>|
+    <a asp-action="Index" asp-controller="Sales" asp-route-outletId="@Model.Id">Sales</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
