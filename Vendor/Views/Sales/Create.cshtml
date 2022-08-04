@@ -2,10 +2,12 @@
 @using Newtonsoft.Json;
 @using Microsoft.AspNetCore.Identity
 @using Vendor.Constants
+@using static Vendor.Utilities.Enums
 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
+<link rel="stylesheet" href="~/css/StyleSheet.css"/>
 
 @{
     ViewData["Title"] = "Create";
@@ -13,6 +15,8 @@
 }
 
 @* <h1>New Order</h1> *@
+
+
 
 <form asp-action="Create">
     <div class="container">
@@ -29,17 +33,23 @@
                     <input id="quantity" class="form-control" type="number" name="Quantity" placeholder="1" value="1" />
                 </div>
                 <div class="form-group">
-                    <input type="button" value="Add To Order" id="AddToCart" class="btn btn-primary" />
+                    <input type="button" value="Add To Cart" id="AddToCart" class="btn btn-primary" />
                 </div>
 
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
 
             </div>
-            <div id="TableDiv" class="col-md-6" style="max-height:250px;overflow-x:auto; margin-top:25px;">
 
+            <div class="col-md-5">
+                    <div id="Reciept"  style="">
+                <div class="top">
+                    <h4>@Model.store.Name</h4>
+                    <p>@Model.outlet.Name</p>
+                </div>
+                <div style="overflow-x:auto;max-height:250px; margin-top:25px;">
                 <table id="Table" class="table">
-                    <thead>
+                    <thead class="tableHead">
                         <tr>
                             <th>
                                 Menu
@@ -50,23 +60,66 @@
                             <th>
                                 Quantity
                             </th>
-                            <th></th>
+                            <th>
+                                Action
+                            </th>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                        </tr>
-
+                        </thead>
+                    <tbody >
+                        
                     </tbody>
+                    
                 </table>
-
+                </div>
+                 <h5>Total : <span id="amountSpan">0</span></h5>
             </div>
-        </div>
+    
+               <div id="totalDiv" style="" class="col-md-5">
+                <div class="row">
+                    <div class="col-md-9">
+                        <hr />
+                        <div class="form-group">
+                            @*<input type="button" value="Save Order" id="SaveOrder" class="btn btn-primary" />*@
+                             <input type="button" data-toggle="modal" data-target="#exampleModal" value="Process Order" class="btn btn-primary" />
+                        </div>
+                            <!-- Button trigger modal -->
+                        <input type="button" value="Print Page" onclick="print()" />
+                    </div>
 
-        <div class="row">
-
+                </div>
+            </div>
+            </div>
+           
         </div>
     </div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+         <div class="form-group">
+                    <label asp-for="PaymentTypes" class="control-label"></label>
+                    <select asp-for="PaymentTypes" class="form-control" asp-items="Html.GetEnumSelectList<PaymentTypes>()"></select>
+         </div>
+         <div class="form-group">
+                    <label asp-for="CustomerId" class="control-label"></label>
+                    <select asp-for="CustomerId" class="form-control" asp-items="ViewBag.Customers"></select>
+         </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" id="SaveOrder" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 
     <div class="container">
         <div class="row">
@@ -77,37 +130,11 @@
 
             </div>
 
-            <div id="totalDiv" style="" class="col-md-5">
-                <div class="row">
-
-                    <div class="col-md-3">
-                        <hr />
-                        <h5>Total : <span id="amountSpan">0</span></h5>
-
-                        <span id="tableValidation" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-9">
-                        <hr />
-                        @*<div class="form-group">
-                                <input type="submit" value="Save" id="" class="btn btn-primary" />
-                            </div>*@
-                        <div class="form-group">
-                            <input type="button" value="Save Order" id="SaveOrder" class="btn btn-primary" />
-                        </div>
-                        <input type="button" value="Print Page" onclick="print()" />
-                    </div>
-
-                </div>
-
-            </div>
+           
         </div>
 
     </div>
 </form>
-
-
-
-
 
  <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
@@ -115,19 +142,31 @@
     var behindMenuItem = @Html.Raw(JsonConvert.SerializeObject(Model.Menu));
     var outletId = @Html.Raw(JsonConvert.SerializeObject(ViewBag.OutletId));
     var userId = @Html.Raw(JsonConvert.SerializeObject(UserManager.GetUserId(User)));
-    console.log(outletId);
-    console.log("ABove");
-    $(document).ready(function () {
 
+
+    $(document).on("click",'.delete',function(){
+        var current = $(this).closest('tr');
+         console.log("Adeshina");
+         //console.log(current.text());
+         //console.log(current.text()[0]);
+         //console.log(current[0].innerHTML);
+            console.log(current.find("td:eq(0)").text())
+         current.remove();
+});
+
+    $(document).ready(function () {
         var cart = [];
         var total = 0;
+        var customer = undefined;
+        var paymentType = undefined;
         $("#AddToCart").on("click", function () {
-            // 
             //console.log("Adding to Cart");
             //console.log(cart, "Cart Items");
             $("#tableValidation").text("");
             var menuSelection = $("#MenuId").children("option:selected").val();
-            if (!mealExist(menuSelection, cart)) {
+            console.log(menuSelection);
+            if(menuSelection !== undefined){
+             if (!mealExist(menuSelection, cart)) {
                 var quantity = $("#quantity").val();
                 var data = findMeal(menuSelection);
                 var updatedData = mealData(data, quantity);
@@ -137,21 +176,29 @@
                 total = total + (data["Amount"] * quantity);
                 $("#amountSpan").text(total);
 
-                $('#Table > tbody:last-child').append('<tr><td>' + data["Name"] + '</td> <td>' + data["Amount"] + " " + ' (' + data["Amount"] * quantity + ')' + '</td><td>' + data["Quantity"] + '</td></tr>');
+                $('#Table > tbody:last-child').append('<tr><td>' + data["Name"] + '</td> <td>' + data["Amount"] + " " + ' (' + data["Amount"] * quantity + ')' + '</td><td>' + data["Quantity"] + '</td><td class='+ "delete"+'> - </td></tr>');
                 var quantitySelection = $("#quantity").val(1);
                  toastr.success('Item Added to Cart');
-                 toastr.display("Hey");
             }
             else {
-                console.log("Meal Already Exist");
-                $("#tableValidation").text("Meal Already Exist On Order List");
+                console.log("Item Already Exist");
+                toastr.warning('Item Already Exist');
+                $("#tableValidation").text("Item Already Exist On Order List");
             }
-
+            }
+            else{
+                toastr.warning('Please Select an item to Add To Cart');
+            }
+  
         });
 
 
 
         $("#SaveOrder").on("click", function () {
+        customer = $("#CustomerId").children("option:selected").val();
+        paymentType = $("#PaymentTypes").children("option:selected").val();
+            console.log(customer);
+            console.log(paymentType);
             console.log("Saving Order");
             var url = $(location).attr('origin') + "/api/SalesAPI/";
             console.log(url);
@@ -162,14 +209,14 @@
                 data: JSON.stringify({
                     "Menus": cart,
                     "OutletId": outletId,
-                    "CustomerId": 1,
+                    "CustomerId": customer,
                     "CashierId": userId,
-                    "Amount": total
-                        }
-                ),
+                    "Amount": total,
+                    "PaymentType":paymentType
+                }),
                 url:url,
                 success: function (response) {
-                    toastr.success('Transaction Created SUccesfully');
+                    toastr.success('Transaction Created Succesfully');
                     console.log("Success");
                     console.log(response);
                 },
@@ -189,13 +236,17 @@
 
     function print() {
 
-        var prtContent = document.getElementById("TableDiv");
-        var WinPrint = window.open('', '', 'left=0,top=50,width=800,height=900,toolbar=0,scrollbars=0,status=0');
+        var prtContent = document.getElementById("Reciept");
+        var WinPrint = window.open('', '', 'left=500,top=50,width=600,height=500,toolbar=0,scrollbars=0,status=0');
+        WinPrint.document.write("<link rel=\"stylesheet\" href=\"/css/StyleSheet.css\" type=\"text/css\"/>");
+       
         WinPrint.document.write(prtContent.innerHTML);
-        WinPrint.document.close();
-        WinPrint.focus();
-        WinPrint.print();
-        WinPrint.close();
+          //WinPrint.document.write(content.innerHTML);
+
+        //WinPrint.document.close();
+        //WinPrint.focus();
+        //WinPrint.print();
+        //WinPrint.close();
 
     }
 
@@ -232,6 +283,13 @@
     }
     function calculator() {
 
+    }
+
+        function processOrder(){
+        customer = $("#CustomerId").children("option:selected").val();
+        var paymentType = $("#PaymentTypes").children("option:selected").val();
+        console.log(customer);
+        console.log(paymentType);
     }
 </script>
 

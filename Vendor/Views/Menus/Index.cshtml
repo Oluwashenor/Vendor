@@ -5,10 +5,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>Menu</h1>
 @*  asp-route-outletId="@ViewBag["outletId"]" *@
+<br />
 <p>
-    <a asp-controller="Menus" asp-route-Id="@Model.OutletId" asp-action="Create">Create New</a>
+    <a class="btn btn-primary" asp-controller="Menus" asp-route-Id="@Model.OutletId" asp-action="Create">Create New Menu</a>
 </p>
 <table class="table">
     <thead>

@@ -1,15 +1,16 @@
-﻿@model Vendor.Models.ViewModels.TransactionIndexViewModel
+﻿@using static Vendor.Utilities.Enums
+@model Vendor.Models.ViewModels.TransactionIndexViewModel
 
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>Transactions</h1>
+<br />
 
 <p>
-    @*<a asp-action="Create">Create New</a>*@
-    <a asp-route-outletId="@Model.OutletId" asp-controller="Sales" asp-action="Create">Create New Sale</a>
+    <a class="btn btn-primary" asp-route-outletId="@Model.OutletId" asp-controller="Sales" asp-action="Create">Create New Sale</a>
 </p>
 <table class="table">
     <thead>
@@ -17,14 +18,18 @@
             <th>
                Outlet
             </th>
-            <th>
-                Customer
-            </th>
+           
             <th>
                Cashier
             </th>
             <th>
              TransactionTime
+            </th>
+             <th>
+             Payment Type
+            </th>
+             <th>
+               Cost
             </th>
             <th></th>
         </tr>
@@ -35,14 +40,18 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Outlet.Name)
             </td>
+           
             <td>
-                @Html.DisplayFor(modelItem => item.Customer.UserName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cashier.Name)
+                @Html.DisplayFor(modelItem => item.Cashier.Email)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.TransactionTime)
+            </td>
+            <td>
+              @Html.DisplayFor(modelItem => item.PaymentType)
+            </td>
+             <td>
+                @Html.DisplayFor(modelItem => item.Amount)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

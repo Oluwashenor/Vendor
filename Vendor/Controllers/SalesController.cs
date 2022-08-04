@@ -10,11 +10,13 @@ using Microsoft.EntityFrameworkCore;
 using Vendor.Data;
 using Vendor.Models;
 using Vendor.Models.ViewModels;
+using static Vendor.Utilities.Enums;
+using static Vendor.Helpers.Helpers;
 
 namespace Vendor.Controllers
 {
     [Authorize]
-    public class SalesController : Controller
+    public class SalesController : BaseController
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
@@ -56,13 +58,36 @@ namespace Vendor.Controllers
         // GET: Sales/Create
         public IActionResult Create(int outletId)
         {
-            
+
             //ViewData["TransactionId"] = new SelectList(_context.Transactions, "Id", "Id");
+            var outlet = _context.Outlets.Where(o=>o.Id == outletId).Include(o=>o.Store).FirstOrDefault();
+            if(outlet == null)
+            {
+                throw new Exception();
+            }
+            var customers = _context.Customers.Where(c => c.OutletId == outletId).ToList();
+
             var menu = _context.Menus.Where(m=>m.OutletId== outletId).ToList();
             var viewModel = new SalesCreateViewModel()
             {
-                Menu = menu
+                Menu = menu,
+                outlet = outlet,
+                store = outlet.Store,
+
             };
+            if(menu.Count < 1)
+            {
+                DisplayAlert("You need to create at least an item before you can start selling");
+                return RedirectToAction("Index", "Menus", new {outletId = outletId});
+            }
+            var paymentTypes = new List<string>();
+                
+             foreach (var item in Enum.GetNames(typeof(PaymentTypes)))
+            {
+                paymentTypes.Add(item);
+            }
+            ViewData["PaymentTypes"] = new SelectList(paymentTypes);
+            ViewData["Customers"] = new SelectList(customers, "Id", "UserName");
             ViewData["MenuId"] = new SelectList(menu, "Id", "Name");
             ViewData["OutletId"] = outletId;
             return View(viewModel);

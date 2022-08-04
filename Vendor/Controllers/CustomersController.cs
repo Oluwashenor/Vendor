@@ -19,18 +19,18 @@ namespace Vendor.Controllers
             _context = context;
         }
 
-        // GET: Customers
-        //public async Task<IActionResult> Index()
-        //{
-        //    var applicationDbContext = _context.Customers.Include(c => c.Outlet);
-        //    return View(await applicationDbContext.ToListAsync());
-        //}
-        public async Task<IActionResult> Index(int customerId)
+        //GET: Customers
+        public async Task<IActionResult> Index(int? outletId)
         {
-            //var loggedInUser = _userManager.GetUserId(User);
-            var applicationDbContext = _context.Customers;
+            var applicationDbContext = _context.Customers.Where(c=>c.OutletId == outletId).Include(c => c.Outlet);
             return View(await applicationDbContext.ToListAsync());
         }
+        //public async Task<IActionResult> Index(int customerId)
+        //{
+        //    //var loggedInUser = _userManager.GetUserId(User);
+        //    var applicationDbContext = _context.Customers;
+        //    return View(await applicationDbContext.ToListAsync());
+        //}
 
         // GET: Customers/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -92,7 +92,7 @@ namespace Vendor.Controllers
             {
                 _context.Add(customer);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new {outletId = customer.OutletId});
             }
             ViewData["OutletId"] = new SelectList(_context.Outlets, "Id", "Id", customer.OutletId);
             return View(customer);

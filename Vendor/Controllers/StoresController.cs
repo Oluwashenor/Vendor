@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,7 +14,7 @@ using Vendor.Models.ViewModels;
 
 namespace Vendor.Controllers
 {
-    public class StoresController : Controller
+    public class StoresController : BaseController
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
@@ -37,10 +38,19 @@ namespace Vendor.Controllers
             {
                 var loggedInUser = _userManager.GetUserId(User);
                 var user = _context.ApplicationUsers.Where(u => u.Id == loggedInUser).FirstOrDefault();
-                var stores = _context.Stores.Include(s => s.User).Where(s => s.UserId == loggedInUser);
+                var stores = _context.Stores.Where(s => s.UserId == loggedInUser).Include(s => s.User);
                 var data = await stores.ToListAsync();
                 if(data.Count() < 1){
-                    TempData[SD.Success] = "Welcome, Please Click on \'Create New\' to Begin";
+                    if(user.MaxStores < 1)
+                    {
+                        DisplayAlert("Welcome, Please Reach out to Admin to Enable you Create A Store");
+                       
+                    }
+                    else
+                    {
+                        DisplayAlert("Welcome, Please Click on \'Create New\' to Begin");
+
+                    }
                 }
                
                 var viewModel = new StoreIndexViewModel()
@@ -73,12 +83,19 @@ namespace Vendor.Controllers
             {
                 return NotFound();
             }
-
+            var loggedInUser = _userManager.GetUserId(User);
             var store = await _context.Stores
                 .Include(s => s.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
+            if(!UserValid(loggedInUser, store.UserId))
+            {
+                return RedirectToAction("Index");
+            }
+
             if (store == null)
             {
+                DisplayError("Store not available");
                 return NotFound();
             }
 
@@ -88,6 +105,13 @@ namespace Vendor.Controllers
         // GET: Stores/Create
         public IActionResult Create()
         {
+            var loggedInUser = _userManager.GetUserId(User);
+            var createdStores = storeCount(loggedInUser);
+            var user = _context.ApplicationUsers.Find(loggedInUser);
+            if(createdStores >= user.MaxStores)
+            {
+                return RedirectToAction("Index");
+            }
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Name");
             return View();
         }
@@ -104,16 +128,26 @@ namespace Vendor.Controllers
                 var loggedInUser = _userManager.GetUserId(User);
                 store.UserId = loggedInUser;
             }
-            if (ModelState.IsValid)
+            var user = _context.ApplicationUsers.Find(store.UserId);
+            var maxStores = user.MaxStores;
+            var createdStores = storeCount(user.Id); 
+            if(createdStores >= maxStores)
             {
-                _context.Add(store);
-                await _context.SaveChangesAsync();
-                TempData[SD.Success] = "Store Created Successfully, Please proceed to creating Outlets for this store";
-                return RedirectToAction(nameof(Index));
+                DisplayError("You cannot create more store at the moment as you have reached your store creation limit. Please reach out to the Admin");
+                return RedirectToAction("Index");
             }
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", store.UserId);
-            TempData[SD.Error] = "Unable to Create store, Please Try Again";
-            return View(store);
+                if (ModelState.IsValid)
+                {
+                    _context.Add(store);
+                    await _context.SaveChangesAsync();
+                    DisplayAlert("Store Created Successfully, Please proceed to creating Outlets for this store");
+                    return RedirectToAction(nameof(Index));
+                }
+                ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", store.UserId);
+                TempData[SD.Error] = "Unable to Create store, Please Try Again";
+                return View(store);
+
+           
         }
 
         // GET: Stores/Edit/5
@@ -123,8 +157,12 @@ namespace Vendor.Controllers
             {
                 return NotFound();
             }
-
+            var loggedInUser = _userManager.GetUserId(User);
             var store = await _context.Stores.FindAsync(id);
+            if (!UserValid(loggedInUser, store.UserId))
+            {
+                return RedirectToAction("Index");
+            }
             if (store == null)
             {
                 return NotFound();
@@ -149,6 +187,8 @@ namespace Vendor.Controllers
             {
                 try
                 {
+                    //var loggedInUser = _userManager.GetUserId(User);
+                    //store.UserId = loggedInUser;
                     _context.Update(store);
                     await _context.SaveChangesAsync();
                 }
@@ -176,10 +216,15 @@ namespace Vendor.Controllers
             {
                 return NotFound();
             }
-
+            var loggedInUser = _userManager.GetUserId(User);
             var store = await _context.Stores
                 .Include(s => s.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            if (store.UserId != loggedInUser)
+            {
+                DisplayError("You cant access a store that is not assigned to you");
+                return View(store);
+            }
             if (store == null)
             {
                 return NotFound();
@@ -203,5 +248,13 @@ namespace Vendor.Controllers
         {
             return _context.Stores.Any(e => e.Id == id);
         }
+
+        private int storeCount(String userId)
+        {
+            var createdStores = _context.Stores.Where(s => s.UserId == userId).Count();
+            return createdStores;
+        }
+
+        
     }
 }

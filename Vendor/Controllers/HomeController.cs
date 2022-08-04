@@ -11,7 +11,7 @@ using Vendor.Models;
 
 namespace Vendor.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
         private readonly SignInManager<IdentityUser> _signInManager;
@@ -27,16 +27,17 @@ namespace Vendor.Controllers
           
           if(_signInManager.IsSignedIn(User)){
             if(User.IsInRole(Roles.Uncleshenor)){
-                TempData[SD.Success] = "Welcome Uncle Shenor";
-            }
+                    DisplayAlert("Welcome Uncle Shenor");
+                }
             else if(User.IsInRole(Roles.StoreOwner)){
-                TempData[SD.Success] = "Welcome {0}, Please click on store to create a store";
+                    DisplayAlert("Welcome");
+                    
             }
             else if(User.IsInRole(Roles.Cashier)){
-                TempData[SD.Success] = "Welcome {0}, Please click on store to create a store";
+                    DisplayAlert("Welcome {0}, Please click on store to create a store");
             }
             else{
-                 TempData[SD.Success] = "You have not been assigned a role yet";
+                    DisplayAlert("You have not been assigned a role yet");
             }
             
           }

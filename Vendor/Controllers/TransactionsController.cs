@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Vendor.Data;
 using Vendor.Models;
 using Vendor.Models.ViewModels;
@@ -27,8 +26,7 @@ namespace Vendor.Controllers
         public async Task<IActionResult> Index(int? outletId)
         {
             var user = _userManager.GetUserId(User);
-            //.Include(s => s.Cashier).Include(s => s.Customer).Include(s => s.Outlet)
-            var applicationDbContext = _context.Transactions.Where(t=> t.OutletId == outletId);
+            var applicationDbContext = _context.Transactions.Where(t=> t.OutletId == outletId).OrderByDescending(x=>x.TransactionTime).Include(s => s.Cashier).Include(s => s.Customer).Include(s => s.Outlet);
             var transactions = await applicationDbContext.ToListAsync();
             var viewModel = new TransactionIndexViewModel()
             {

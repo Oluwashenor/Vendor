@@ -73,13 +73,12 @@ namespace Vendor.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            if (!await _roleManager.RoleExistsAsync("StoreOwner"))
+            if (!await _roleManager.RoleExistsAsync("Admin"))
             {
-                await _roleManager.CreateAsync(new IdentityRole("Cashier"));
-                await _roleManager.CreateAsync(new IdentityRole("StoreOwner"));
-                await _roleManager.CreateAsync(new IdentityRole("Admin"));
-                await _roleManager.CreateAsync(new IdentityRole("UncleShenor"));
-              
+                foreach (var role in Constants.Roles.AllRoles)
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(role));
+                }     
             }
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();

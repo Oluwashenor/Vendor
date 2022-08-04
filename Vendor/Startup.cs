@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Vendor.Constants;
 using Vendor.Data;
 
 namespace Vendor
@@ -34,6 +35,8 @@ namespace Vendor
 
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddAuthorization(options =>
+            options.AddPolicy("Admin", policy=> policy.RequireRole(Roles.Admin)));
             services.AddControllersWithViews();
         }
 

@@ -1,37 +1,38 @@
-﻿@model IEnumerable<Vendor.Models.Outlet>
+﻿@model Vendor.Models.ViewModels.OutletIndexViewModel
 
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
-
+<h1>Outlets</h1>
+<br />
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="btn btn-primary" asp-action="Create" asp-route-storeId="@Model.storeId">Create New Outlet</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Outlets)
             </th>
-            @*<th>
-                @Html.DisplayNameFor(model => model.Store)
-            </th>*@
+            <th>
+                @Html.DisplayNameFor(model => model.StoreName)
+            </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Outlets) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
-            @*<td>
-                @Html.DisplayFor(modelItem => item.Store.Name)
-            </td>*@
             <td>
+                @Html.DisplayFor(modelItem => item.Store.Name)
+            </td>
+            <td>
+                <a asp-action="Index" asp-controller="Accounts" asp-route-id="@item.Id">Accounts</a> |
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>

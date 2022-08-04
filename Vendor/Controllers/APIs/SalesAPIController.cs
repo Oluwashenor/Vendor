@@ -10,6 +10,7 @@ using Vendor.Constants;
 using Vendor.Data;
 using Vendor.Models;
 using Vendor.Models.DTOs;
+using static Vendor.Utilities.Enums;
 
 namespace Vendor.Controllers.APIs
 {
@@ -82,13 +83,16 @@ namespace Vendor.Controllers.APIs
         [HttpPost]
         public async Task<ActionResult<Transaction>> PostSale(CreateSalesDTO sales)
         { 
+            var paymentType = sales.PaymentType;
+          
             var transaction = new Transaction
             {
                 OutletId =sales.OutletId,
                 CashierId = sales.CashierId,
                 CustomerId = sales.CustomerId,
                 TransactionTime = DateTime.Now,
-                Amount = sales.Amount
+                Amount = sales.Amount,
+                PaymentType = (PaymentTypes)sales.PaymentType,
             };
             var customer =await _context.Customers.FindAsync(transaction.CustomerId);
             if(customer == null){

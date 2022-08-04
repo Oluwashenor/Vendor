@@ -5,14 +5,16 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>My Stores</h1>
+
+<br />
 
 <p>
     @if (Model.Store.Count() == 0)
     {
         if (Model.User.MaxStores > 0)
         {
-            <a asp-action="Create">Create New</a>
+            <a class="btn btn-primary" asp-action="Create">Create New Store</a>
         }
         else
          {
@@ -22,7 +24,7 @@
     }
     else if (Model.Store.Count() < Model.User.MaxStores)
     {
-        <a asp-action="Create">Create New</a>
+        <a class="btn btn-primary" asp-action="Create">Create New Store</a>
     }
     else
     {

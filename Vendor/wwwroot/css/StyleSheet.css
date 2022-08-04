@@ -1,0 +1,32 @@
+﻿
+table {
+
+}
+
+h4{
+    font-size:18px;
+    text-align:center;
+}
+
+.tableHead {
+    background-color: lightgrey;
+    margin: 5px 5px;
+    padding: 5px 5px;
+}
+
+p{
+    font-size:14px;
+    text-align:center;
+}
+
+td {
+    text-align: center;
+    padding:5px 10px;
+    margin:0px 5px;
+}
+
+tr {
+    margin:5px 5px;
+    padding:5px 5px;
+    text-align: center;
+}

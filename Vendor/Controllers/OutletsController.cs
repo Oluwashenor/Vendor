@@ -9,10 +9,11 @@ using Microsoft.EntityFrameworkCore;
 using Vendor.Constants;
 using Vendor.Data;
 using Vendor.Models;
+using Vendor.Models.ViewModels;
 
 namespace Vendor.Controllers
 {
-    public class OutletsController : Controller
+    public class OutletsController : BaseController
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
@@ -26,22 +27,52 @@ namespace Vendor.Controllers
         // GET: Outlets
         public async Task<IActionResult> Index(int? storeId)
         {
-            //if(storeId == null)
-            //{
-            //    return NotFound();
-            //}
-            var user = _userManager.GetUserId(User);
-            var stores = _context.Stores.Where(s =>s.UserId == user);
-            var outlets =new List<Outlet>();
-            foreach (var store in stores)
+            if(storeId == null)
             {
-                var outletForStore = await _context.Outlets.Include(l => l.Store).Where(o => o.StoreId == store.Id).ToListAsync();
-                foreach (var outlet in outletForStore)
+                return RedirectToAction("Index", "Stores");
+            }
+            var user = _userManager.GetUserId(User);
+            var outlets = new List<Outlet>();
+            var stor = await _context.Stores.FindAsync(storeId);
+            if (!UserValid(user, stor.UserId))
+            {
+                return RedirectToAction("Index", "Stores");
+            }
+            var viewModel = new OutletIndexViewModel()
+            {
+                Outlets = outlets,
+                storeId = storeId
+            };
+            if (storeId == null)
+            {
+                var stores = _context.Stores.Where(s => s.UserId == user);
+                foreach (var store in stores)
+                {
+                    var outletsForStore = await _context.Outlets.Where(o => o.StoreId == store.Id).Include(l => l.Store).ToListAsync();
+                    foreach (var outlet in outletsForStore)
+                    {
+                        outlets.Add(outlet);
+                    }
+                }
+            }
+            else
+            {
+                var store = _context.Stores.Where(s => s.UserId == user).Where(s => s.Id == storeId).FirstOrDefault();
+               
+                var outletsForStore = await _context.Outlets.Where(o => o.StoreId == storeId).Include(l => l.Store).ToListAsync();
+                foreach (var outlet in outletsForStore)
                 {
                     outlets.Add(outlet);
                 }
+
+                if (outlets.Count < 1)
+                {
+                    DisplayAlert("Please Click on \"Create New\", To create a new outlet for this store");
+
+                }
             }
-            return View(outlets);
+          
+            return View(viewModel);
         }
 
         // GET: Outlets/Details/5
@@ -64,11 +95,15 @@ namespace Vendor.Controllers
         }
 
         // GET: Outlets/Create
-        public IActionResult Create()
+        public IActionResult Create(int? storeId)
         {
             //ViewData["StoreId"] = new SelectList(_context.Stores, "Id", "Name");
+            if(storeId == null)
+            {
+                throw new ArgumentNullException(nameof(storeId));
+            }
             var loggedInUser = _userManager.GetUserId(User);
-            var selectList = _context.Stores.Where(s=> s.UserId == loggedInUser);
+            var selectList = _context.Stores.Where(s=> s.Id == storeId);
             ViewBag.StoreId = new SelectList(selectList, "Id", "Name");
             return View();
         }
@@ -84,11 +119,11 @@ namespace Vendor.Controllers
             {
                 _context.Add(outlet);
                 await _context.SaveChangesAsync();
-                  TempData[SD.Success] = "Outlet Created Successfully, Please proceed to creating Menus for this store";
+                DisplayAlert("Outlet Created Successfully, Please proceed to creating Menus for this store");
                 return RedirectToAction("Index", new { storeId = outlet.StoreId });
             }
             ViewData["StoreId"] = new SelectList(_context.Stores, "Id", "Id", outlet.StoreId);
-              TempData[SD.Error] = "Unable to Create Outlet";
+            DisplayError("Unable to Create Outlet");
             return View(outlet);
         }
 

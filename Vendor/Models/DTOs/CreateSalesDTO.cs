@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Vendor.Utilities.Enums;
 
 namespace Vendor.Models.DTOs
 {
@@ -12,5 +13,6 @@ namespace Vendor.Models.DTOs
         public int OutletId { get; set; }
         public double Amount { get; set; }
         public List<CreateMenuDTO> Menus { get; set; }
+        public int PaymentType { get; set; }
     }
 }

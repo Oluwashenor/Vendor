@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Vendor.Utilities.Enums;
 
 namespace Vendor.Models
 {
@@ -20,5 +23,6 @@ namespace Vendor.Models
         public string CashierId { get; set; }
         public DateTime TransactionTime { get; set; }
         public double Amount { get; set; }
+        public PaymentTypes PaymentType { get; set; }
     }
 }

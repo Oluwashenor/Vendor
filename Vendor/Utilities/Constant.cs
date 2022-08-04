@@ -7,11 +7,16 @@ namespace Vendor.Constants
 {
     public class Constant
     {
-        
+
     }
 
-     public static class Roles
-     {
+ 
+    public static class Roles
+    {
+        public static List<string> AllRoles = new List<string>
+        {
+            Uncleshenor, StoreOwner, Admin, Cashier
+        };
         public const string Uncleshenor = "UncleShenor";
         public const string StoreOwner = "StoreOwner";
         public const string Admin = "Admin";
@@ -22,5 +27,7 @@ namespace Vendor.Constants
     {
         public static string Success = "Success";
         public static string Error = "Error";
+        public static string Warning = "Warning";
+        public static string Info = "Info";
     }
 }
