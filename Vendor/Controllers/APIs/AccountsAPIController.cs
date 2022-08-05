@@ -28,8 +28,11 @@ namespace Vendor.Controllers.APIs
 
         // GET: api/<AccountsController>
         [HttpPost]
-        public async Task<IActionResult> Table()
+        public async Task<IActionResult> Table(string Range)
         {
+           
+            if (Range == null) Range = "Daily";
+            
             try
             {
                 var draw = Request.Form["draw"].FirstOrDefault(); // get total page size
@@ -48,7 +51,7 @@ namespace Vendor.Controllers.APIs
                 }
                 var transactions = await _context.Transactions.Where(t => t.OutletId == outlet.Id).ToListAsync();
                 var data = new List<ViewAccountDTO>();
-                var Range = "Daily";
+               
                 if (Range.Contains("Daily"))
                 {
                     data = transactions.GroupBy(t => t.TransactionTime.Day).Select(t => new ViewAccountDTO
@@ -79,7 +82,7 @@ namespace Vendor.Controllers.APIs
                    
                 recordsTotal = data.Count();
                 var d = data.Skip(skip).Take(pageSize).ToList();
-                var jsonData = new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = d };
+                var jsonData = new { draw = draw, range=Range, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = d };
                 return Ok(jsonData);
             }
             catch (Exception ex)

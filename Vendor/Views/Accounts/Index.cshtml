@@ -11,8 +11,7 @@
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
     <a onclick="refresh('Daily')" class="dropdown-item">Daily</a>
-    <a class="dropdown-item" href="#">Weekly</a>
-    <a class="dropdown-item" href="#">Monthly</a>
+    <a onclick="refresh('Montly')" class="dropdown-item">Monthly</a>
   </div>
 </div>
     </div>
@@ -37,20 +36,28 @@
 
 <script>
          function refresh(data){
+               $("#customerDatatable").DataTable({}).destroy();
            console.log(data);
-           myTable()
+           
+           myTable(data)
         }
 
 
-        function myTable() {
-            
+        function myTable(table) {
+           if (table === undefined || table === ""){
+                table = "Something";
+           }
     $("#customerDatatable").DataTable({
         "processing": true,
         "serverSide": true,
         "filter": true,
         "ajax": {
-            "url": "/api/AccountsAPI",
+            "url": "/api/AccountsAPI/?Range="+table,
             "type": "POST",
+            "Content-Type":'application/x-www-form-urlencoded',
+            data: JSON.stringify({
+                "Range": "Sam"
+            }),
             "datatype": "json",
               dataFilter: function(reps) {
                 console.log(reps);
@@ -88,7 +95,7 @@
 
 
 $(document).ready(
-    myTable()
+    //myTable()
     );  
 
 </script>
