@@ -7,11 +7,12 @@
     <div class="row">
     <div class="dropdown">
   <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Variance
+    Sort Report
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
     <a onclick="refresh('Daily')" class="dropdown-item">Daily</a>
     <a onclick="refresh('Montly')" class="dropdown-item">Monthly</a>
+    <a onclick="refresh('Yearly')" class="dropdown-item">Yearly</a>
   </div>
 </div>
     </div>
@@ -36,9 +37,7 @@
 
 <script>
          function refresh(data){
-               $("#customerDatatable").DataTable({}).destroy();
-           console.log(data);
-           
+           console.log(data);   
            myTable(data)
         }
 
@@ -50,6 +49,7 @@
     $("#customerDatatable").DataTable({
         "processing": true,
         "serverSide": true,
+        "bDestroy": true,
         "filter": true,
         "ajax": {
             "url": "/api/AccountsAPI/?Range="+table,

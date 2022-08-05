@@ -61,15 +61,17 @@ namespace Vendor.Controllers.APIs
                         Amount = t.Select(t => t.Amount).Sum(),
                     }).ToList();
                 }
-                //else if (Range.Contains("Weekly"))
-                //{
-                //    data = transactions.GroupBy(t => t.TransactionTime.`).Select(t => new ViewAccountDTO
-                //    {
-                //        Name = "Daily Transaction",
-                //        Month = t.Select(t => t.TransactionTime.Month).First(),
-                //        Amount = t.Select(t => t.Amount).Sum(),
-                //    }).ToList();
-                //}
+              
+                else if (Range.Contains("Yearly"))
+                {
+                    data = transactions.GroupBy(t => t.TransactionTime.Year).Select(t => new ViewAccountDTO
+                    {
+                        Name = "Yearly Transaction",
+                        Month = t.Select(t => t.TransactionTime.Day).First(),
+                        Amount = t.Select(t => t.Amount).Sum(),
+                    }).ToList();
+                }
+
                 else
                 {
                     data = transactions.GroupBy(t => t.TransactionTime.Month).Select(t => new ViewAccountDTO
