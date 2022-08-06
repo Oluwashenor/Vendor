@@ -5,16 +5,24 @@
 <link href="~/lib/datatables/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
 <div class="container">
     <div class="row">
-    <div class="dropdown">
-  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Sort Report
-  </button>
-  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <a onclick="refresh('Daily')" class="dropdown-item">Daily</a>
-    <a onclick="refresh('Montly')" class="dropdown-item">Monthly</a>
-    <a onclick="refresh('Yearly')" class="dropdown-item">Yearly</a>
-  </div>
-</div>
+        <div class="container">
+            <div class="dropdown">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Sort Report
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a onclick="refresh('Daily')" class="dropdown-item">Daily</a>
+                <a onclick="refresh('Montly')" class="dropdown-item">Monthly</a>
+                <a onclick="refresh('Yearly')" class="dropdown-item">Yearly</a>
+              </div>
+            </div>
+        </div>
+
+        <div>
+            <span Id="current">Adeshina</span>
+            
+        </div>
+        
     </div>
     <br />
     <div style="width:90%; margin:0 auto;">
@@ -24,6 +32,7 @@
                     <th>name</th>
                     <th>date</th>
                     <th>sum</th>
+                      <th>Unique</th>
                     @*<th>Actions</th>*@
                 </tr>
             </thead>
@@ -37,10 +46,10 @@
 
 <script>
          function refresh(data){
-           console.log(data);   
-           myTable(data)
+             var yen = document.getElementById("dropdownMenuButton");
+             yen.innerHTML = data;
+             myTable(data)
         }
-
 
         function myTable(table) {
            if (table === undefined || table === ""){
@@ -76,6 +85,7 @@
             { "data": "name", "name": "Name", "autoWidth": true },
             { "data": "month", "name": "Date", "autoWidth": true },
             { "data": "amount", "name": "Sum", "autoWidth": true },
+            { "data": "unique", "name": "Data", "autoWidth": true },
             //{
             //    "render": function (data,row) { return "<a href='#' class='btn btn-danger' onclick=DeleteCustomer('" + row.id+ "'); >Delete</a>";   }
             //},

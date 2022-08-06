@@ -58,6 +58,7 @@ namespace Vendor.Controllers.APIs
                     {
                         Name = "Daily Transaction",
                         Month = t.Select(t => t.TransactionTime.Day).First(),
+                        Unique = t.Select(t => t.TransactionTime.DayOfWeek).First().ToString(),
                         Amount = t.Select(t => t.Amount).Sum(),
                     }).ToList();
                 }
@@ -68,6 +69,7 @@ namespace Vendor.Controllers.APIs
                     {
                         Name = "Yearly Transaction",
                         Month = t.Select(t => t.TransactionTime.Day).First(),
+                        Unique = t.Select(t => t.TransactionTime.Day).First().ToString(),
                         Amount = t.Select(t => t.Amount).Sum(),
                     }).ToList();
                 }
@@ -78,13 +80,14 @@ namespace Vendor.Controllers.APIs
                     {
                         Name = "Monthly Transaction",
                         Month = t.Select(t => t.TransactionTime.Month).First(),
+                        Unique = t.Select(t => t.TransactionTime).First().ToString("MMMM yyyy"),
                         Amount = t.Select(t => t.Amount).Sum(),
                     }).ToList();
                 }
                    
                 recordsTotal = data.Count();
                 var d = data.Skip(skip).Take(pageSize).ToList();
-                var jsonData = new { draw = draw, range=Range, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = d };
+                var jsonData = new { draw = draw, range=Range,  recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = d };
                 return Ok(jsonData);
             }
             catch (Exception ex)

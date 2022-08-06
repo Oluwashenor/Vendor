@@ -10,6 +10,7 @@ namespace Vendor.Models.DTOs
         public DateTime Period { get; set; }
         public int Month { get; set; }
         public int Day { get; set; }
+        public string Unique { get; set; }
 
     }
 }

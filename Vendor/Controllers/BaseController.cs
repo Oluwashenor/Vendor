@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Vendor.Constants;
 using Vendor.Data;
 
@@ -6,10 +7,9 @@ namespace Vendor.Controllers
 {
     public class BaseController : Controller
     {
-      
         public BaseController()
         {
-           
+         
         }
         public void DisplayAlert(string message)
         {
@@ -23,7 +23,7 @@ namespace Vendor.Controllers
 
         public bool UserValid(string userId, string objectId)
         {
-          
+         
             if(userId != objectId)
             {
                 DisplayError("You can not access this property as it is not assigned to you");
