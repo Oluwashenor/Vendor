@@ -34,7 +34,7 @@ namespace Vendor
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultUI();
             services.AddAuthorization(options =>
             options.AddPolicy("Admin", policy=> policy.RequireRole(Roles.Admin)));
             services.AddControllersWithViews();

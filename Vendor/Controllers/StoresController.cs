@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Vendor.Constants;
 using Vendor.Data;
 using Vendor.Models;
+using Vendor.Models.DTOs;
 using Vendor.Models.ViewModels;
 
 namespace Vendor.Controllers
@@ -88,29 +89,42 @@ namespace Vendor.Controllers
                 .Include(s => s.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if(!UserValid(loggedInUser, store.UserId))
-            {
-                return RedirectToAction("Index");
-            }
-
             if (store == null)
             {
                 DisplayError("Store not available");
                 return NotFound();
             }
+            var availableOutlets = await _context.Outlets.Where(o => o.StoreId == store.Id).ToListAsync();
 
-            return View(store);
+            if(!UserValid(loggedInUser, store.UserId))
+            {
+                return RedirectToAction("Index");
+            }
+
+          
+
+            var model = new StoreDetailsViewModel()
+            {
+                Store = store,
+                Outlets = availableOutlets.Count()
+            };
+
+            return View(model);
         }
 
         // GET: Stores/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var loggedInUser = _userManager.GetUserId(User);
             var createdStores = storeCount(loggedInUser);
             var user = _context.ApplicationUsers.Find(loggedInUser);
-            if(createdStores >= user.MaxStores)
+            var userRole = await _userManager.IsInRoleAsync(user,Roles.Uncleshenor);
+            if (!userRole)
             {
-                return RedirectToAction("Index");
+                if (createdStores >= user.MaxStores)
+                {
+                    return RedirectToAction("Index");
+                }
             }
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Name");
             return View();
@@ -129,13 +143,19 @@ namespace Vendor.Controllers
                 store.UserId = loggedInUser;
             }
             var user = _context.ApplicationUsers.Find(store.UserId);
-            var maxStores = user.MaxStores;
-            var createdStores = storeCount(user.Id); 
-            if(createdStores >= maxStores)
+            var userRole = await _userManager.IsInRoleAsync(user, Roles.Uncleshenor);
+            if (!userRole)
             {
-                DisplayError("You cannot create more store at the moment as you have reached your store creation limit. Please reach out to the Admin");
-                return RedirectToAction("Index");
+                var maxStores = user.MaxStores;
+                var createdStores = storeCount(user.Id);
+
+                if (createdStores >= maxStores)
+                {
+                    DisplayError("You cannot create more store at the moment as you have reached your store creation limit. Please reach out to the Admin");
+                    return RedirectToAction("Index");
+                }
             }
+          
                 if (ModelState.IsValid)
                 {
                     _context.Add(store);

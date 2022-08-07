@@ -1,4 +1,4 @@
-﻿@model Vendor.Models.Store
+﻿@model Vendor.Models.DTOs.StoreDetailsViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -12,10 +12,10 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.Store.Name)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.Store.Name)
         </dd>
 
         <dt class="col-sm-2">
@@ -28,29 +28,29 @@
         @if (User.IsInRole("UncleShenor"))
         {
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.IsActive)
+                @Html.DisplayNameFor(model => model.Store.IsActive)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.IsActive)
+                @Html.DisplayFor(model => model.Store.IsActive)
             </dd>
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.IsLocked)
+                @Html.DisplayNameFor(model => model.Store.IsLocked)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.IsLocked)
+                @Html.DisplayFor(model => model.Store.IsLocked)
             </dd>
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.IsDeleted)
+                @Html.DisplayNameFor(model => model.Store.IsDeleted)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.IsDeleted)
+                @Html.DisplayFor(model => model.Store.IsDeleted)
             </dd>
         }
 
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Store.Id">Edit</a> |
     <a asp-action="Index">Back </a> |
-    <a asp-action="Index" asp-route-storeId="@Model.Id" asp-controller="Outlets">Outlets</a>
+    <a asp-action="Index" asp-route-storeId="@Model.Store.Id" asp-controller="Outlets">Outlets</a>
 </div>

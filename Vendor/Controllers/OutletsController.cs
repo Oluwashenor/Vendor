@@ -118,6 +118,13 @@ namespace Vendor.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(outlet);
+                _context.Customers.Add(new Customer
+                {
+                    Id = 0,
+                    UserName = "Customer",
+                    OutletId= outlet.Id
+
+                });
                 await _context.SaveChangesAsync();
                 DisplayAlert("Outlet Created Successfully, Please proceed to creating Menus for this store");
                 return RedirectToAction("Index", new { storeId = outlet.StoreId });

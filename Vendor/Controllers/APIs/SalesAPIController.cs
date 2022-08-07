@@ -85,19 +85,18 @@ namespace Vendor.Controllers.APIs
         { 
             var paymentType = sales.PaymentType;
           
+           
+            var customer =await _context.Customers.FindAsync(sales.CustomerId);
+
             var transaction = new Transaction
             {
-                OutletId =sales.OutletId,
+                OutletId = sales.OutletId,
                 CashierId = sales.CashierId,
                 CustomerId = sales.CustomerId,
                 TransactionTime = DateTime.Now,
                 Amount = sales.Amount,
                 PaymentType = (PaymentTypes)sales.PaymentType,
             };
-            var customer =await _context.Customers.FindAsync(transaction.CustomerId);
-            if(customer == null){
-                return NotFound("No Customer Found");
-            }
 
             _context.Transactions.Add(transaction);
             var saveTransaction = await _context.SaveChangesAsync();

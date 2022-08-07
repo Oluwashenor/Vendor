@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,11 +8,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Vendor.Constants;
 using Vendor.Data;
 using Vendor.Models.ViewModels;
 
 namespace Vendor.Controllers
 {
+    [Authorize(Roles = Roles.Uncleshenor)]
     public class UsersController : Controller
     {
 
